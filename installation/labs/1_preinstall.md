@@ -101,7 +101,25 @@ tmpfs /run/user/1000 tmpfs rw,seclabel,nosuid,nodev,relatime,size=1579196k,mode=
 
 
 3) If you have ext-based volumes, list the reserve space setting 
-N/A
+[root@edge zookeeper]# lsblk
+NAME        MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+nvme0n1     259:1    0  25G  0 disk
+├─nvme0n1p1 259:2    0   1M  0 part
+└─nvme0n1p2 259:3    0  25G  0 part /
+nvme1n1     259:0    0  25G  0 disk /clouderadata
+[root@edge zookeeper]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2   25G   15G   11G  57% /
+devtmpfs        7.6G     0  7.6G   0% /dev
+tmpfs           7.6G     0  7.6G   0% /dev/shm
+tmpfs           7.6G  8.6M  7.6G   1% /run
+tmpfs           7.6G     0  7.6G   0% /sys/fs/cgroup
+tmpfs           1.6G     0  1.6G   0% /run/user/997
+tmpfs           1.6G     0  1.6G   0% /run/user/0
+cm_processes    7.6G   15M  7.6G   1% /run/cloudera-scm-agent/process
+tmpfs           1.6G     0  1.6G   0% /run/user/1000
+/dev/nvme1n1     25G  434M   23G   2% /clouderadata
+
 
 4) Disable transparent hugepage support
 [root@ip-172-31-34-49 ec2-user]# cat /etc/rc.d/rc.local
