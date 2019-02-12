@@ -13,4 +13,5 @@ sudo -u hdfs hdfs dfs -cp -ptopax /precious/.snapshot/sebc-hdfs-test /precious/
 
 sudo -u hdfs hdfs dfs -ls /precious
 Found 1 items
--rw-r--r-- 3 hdfs supergroup 1019399 2019-02-12 10:55 /precious/install-bootcamp-master.zip
+-rw-r--r--   3 hdfs supergroup    1019399 2019-02-12 10:55 /precious/install-bootcamp-master.zip
+
