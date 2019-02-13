@@ -1,4 +1,5 @@
--> Create User & Directory
+##Create User & Directory
+```
 useradd kod30
 passwd kod30
 usermod -G wheel kod30
@@ -6,9 +7,9 @@ usermod -G wheel kod30
 sudo su - kod30
 sudo -u hdfs hdfs dfs -mkdir /user/kod30
 #sudo -u hdfs hdfs dfs -chown kod30:kod30 /user/kod30
-
-->Create a 10 GB file using teragen
-
+```
+##Create a 10 GB file using teragen
+```
 [kod30@edge jars]$ time hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar teragen -D dfs.blocksize=33554432 -D dfs.replication=1 1000000 /user/kode30/teragen
 
 19/02/12 13:10:26 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
@@ -72,9 +73,9 @@ sudo -u hdfs hdfs dfs -mkdir /user/kod30
 real    0m9.358s
 user    0m6.273s
 sys     0m0.242s
-
-->Run the terasort command on this file 
-
+```
+##Run the terasort command on this file 
+```
 [kod30@edge jars]$time hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar terasort /user/kode30/teragen /user/kode30/teragen
 19/02/12 13:14:47 INFO terasort.TeraSort: starting
 19/02/12 13:14:48 INFO input.FileInputFormat: Total input paths to process : 1
@@ -255,3 +256,4 @@ Spent 458ms computing partitions.
 real    0m8.994s
 user    0m12.587s
 sys     0m0.696s
+```
