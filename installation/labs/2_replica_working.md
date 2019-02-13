@@ -1,4 +1,5 @@
-MariaDB [(none)]> SHOW SLAVE STATUS\G;
+**MariaDB [(none)]> SHOW SLAVE STATUS\G;
+```
 *************************** 1. row ***************************
                Slave_IO_State: Waiting for master to send event
                   Master_Host: 172.31.34.49
@@ -43,3 +44,4 @@ Master_SSL_Verify_Server_Cert: No
 1 row in set (0.00 sec)
 
 ERROR: No query specified
+```
