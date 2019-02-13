@@ -9,8 +9,8 @@ Terasort maps=4 reduces=1 map.memory.mb=512 map.max.heap=409 reduce.memory.mb=51
 real    1m43.061s
 user    1m25.460s
 sys     0m7.660s
-Deleted /user/andreswagner/results/tg-10GB-4-1-512
-Deleted /user/andreswagner/results/ts-10GB-4-1-512
+Deleted /tmp/tg-10GB-4-1-512
+Deleted /tmp/ts-10GB-4-1-512
 
 
 Teragen maps=4 memory.mb=1024 max.heap=819
@@ -24,8 +24,8 @@ Terasort maps=4 reduces=1 map.memory.mb=1024 map.max.heap=819 reduce.memory.mb=1
 real    1m28.221s
 user    1m26.605s
 sys     0m6.903s
-Deleted /user/andreswagner/results/tg-10GB-4-1-1024
-Deleted /user/andreswagner/results/ts-10GB-4-1-1024
+Deleted /tmp/tg-10GB-4-1-1024
+Deleted /tmp/ts-10GB-4-1-1024
 
 
 Teragen maps=4 memory.mb=512 max.heap=409
@@ -39,8 +39,8 @@ Terasort maps=4 reduces=4 map.memory.mb=512 map.max.heap=409 reduce.memory.mb=51
 real    0m8.654s
 user    0m10.867s
 sys     0m0.363s
-Deleted /user/andreswagner/results/tg-10GB-4-4-512
-Deleted /user/andreswagner/results/ts-10GB-4-4-512
+Deleted /tmp/tg-10GB-4-4-512
+Deleted /tmp/ts-10GB-4-4-512
 
 
 Teragen maps=4 memory.mb=1024 max.heap=819
@@ -54,8 +54,8 @@ Terasort maps=4 reduces=4 map.memory.mb=1024 map.max.heap=819 reduce.memory.mb=1
 real    0m27.990s
 user    0m29.344s
 sys     0m1.387s
-Deleted /user/andreswagner/results/tg-10GB-4-4-1024
-Deleted /user/andreswagner/results/ts-10GB-4-4-1024
+Deleted /tmp/tg-10GB-4-4-1024
+Deleted /tmp/ts-10GB-4-4-1024
 
 
 Teragen maps=8 memory.mb=512 max.heap=409
@@ -69,8 +69,8 @@ Terasort maps=8 reduces=1 map.memory.mb=512 map.max.heap=409 reduce.memory.mb=51
 real    0m19.950s
 user    0m26.619s
 sys     0m1.289s
-Deleted /user/andreswagner/results/tg-10GB-8-1-512
-Deleted /user/andreswagner/results/ts-10GB-8-1-512
+Deleted /tmp/tg-10GB-8-1-512
+Deleted /tmp/ts-10GB-8-1-512
 
 
 Teragen maps=8 memory.mb=1024 max.heap=819
@@ -84,8 +84,8 @@ Terasort maps=8 reduces=1 map.memory.mb=1024 map.max.heap=819 reduce.memory.mb=1
 real    0m4.885s
 user    0m10.121s
 sys     0m0.375s
-Deleted /user/andreswagner/results/tg-10GB-8-1-1024
-Deleted /user/andreswagner/results/ts-10GB-8-1-1024
+Deleted /tmp/tg-10GB-8-1-1024
+Deleted /tmp/ts-10GB-8-1-1024
 
 
 Teragen maps=8 memory.mb=512 max.heap=409
@@ -99,8 +99,8 @@ Terasort maps=8 reduces=4 map.memory.mb=512 map.max.heap=409 reduce.memory.mb=51
 real    0m5.899s
 user    0m10.867s
 sys     0m0.382s
-Deleted /user/andreswagner/results/tg-10GB-8-4-512
-Deleted /user/andreswagner/results/ts-10GB-8-4-512
+Deleted /tmp/tg-10GB-8-4-512
+Deleted /tmp/ts-10GB-8-4-512
 
 
 Teragen maps=8 memory.mb=1024 max.heap=819
@@ -114,7 +114,7 @@ Terasort maps=8 reduces=4 map.memory.mb=1024 map.max.heap=819 reduce.memory.mb=1
 real    0m4.931s
 user    0m10.963s
 sys     0m0.381s
-Deleted /user/andreswagner/results/tg-10GB-8-4-1024
-Deleted /user/andreswagner/results/ts-10GB-8-4-1024
+Deleted /tmp/tg-10GB-8-4-1024
+Deleted /tmp/ts-10GB-8-4-1024
 Testing loop ended on Wed Feb 13 08:46:18 UTC 2019
 
