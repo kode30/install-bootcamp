@@ -1,4 +1,4 @@
-##Create User & Directory
+#Create User & Directory
 ```
 useradd kod30
 passwd kod30
