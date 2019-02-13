@@ -27,7 +27,7 @@ do
                      -Dmapreduce.job.maps=$i \
                      -Dmapreduce.map.memory.mb=$k \
                      -Dmapreduce.map.java.opts.max.heap=$MAP_MB \
-                     25600000 /user/andreswagner/results/tg-10GB-${i}-${j}-${k} 1>tera_${i}_${j}_${k}.out 2>tera_${i}_${j}_${k}.err
+                     25600000 /tmp/tg-10GB-${i}-${j}-${k} 1>tera_${i}_${j}_${k}.out 2>tera_${i}_${j}_${k}.err
 
         echo Terasort maps=$i reduces=$j map.memory.mb=$k map.max.heap=$MAP_MB reduce.memory.mb=$k reduce.max.heap=$RED_MB
        time ${HADOOP}/hadoop jar $MR/hadoop-examples.jar terasort \
@@ -37,12 +37,12 @@ do
                      -Dmapreduce.map.java.opts.max.heap=$MAP_MB \
                      -Dmapreduce.reduce.memory.mb=$k \
                      -Dmapreduce.reduce.java.opts.max.heap=$RED_MB \
-                      /user/andreswagner/results/tg-10GB-${i}-${j}-${k}  \
-                      /user/andreswagner/results/ts-10GB-${i}-${j}-${k} 1>>tera_${i}_${j}_${k}.out 2>>tera_${i}_${j}_${k}.err
+                      /tmp/tg-10GB-${i}-${j}-${k}  \
+                      /tmp/ts-10GB-${i}-${j}-${k} 1>>tera_${i}_${j}_${k}.out 2>>tera_${i}_${j}_${k}.err
           
 
-        $HADOOP/hadoop fs -rm -r -skipTrash  /user/andreswagner/results/tg-10GB-${i}-${j}-${k}
-        $HADOOP/hadoop fs -rm -r -skipTrash  /user/andreswagner/results/ts-10GB-${i}-${j}-${k}
+        $HADOOP/hadoop fs -rm -r -skipTrash  /tmp/tg-10GB-${i}-${j}-${k}
+        $HADOOP/hadoop fs -rm -r -skipTrash  /tmp/ts-10GB-${i}-${j}-${k}
       done
    done
 done
