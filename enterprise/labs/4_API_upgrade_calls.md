@@ -96,7 +96,7 @@ $ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.c
   "snapshot" : false
 }
 ```
-```
+
 * List all CM users
 ```
 $ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v17/users'
