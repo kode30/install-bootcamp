@@ -1,4 +1,5 @@
-[root@edge journal]# curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v2/cm/deployment'
+*[root@edge journal]# curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v2/cm/deployment'
+```
 {
   "timestamp" : "2019-02-13T11:34:52.172Z",
   "clusters" : [ {
@@ -1025,4 +1026,4 @@
       "value" : "https://archive.cloudera.com/cdh5/parcels/{latest_supported}/,https://archive.cloudera.com/cdh4/parcels/latest/,https://archive.cloudera.com/impala/parcels/latest/,https://archive.cloudera.com/search/parcels/latest/,https://archive.cloudera.com/accumulo/parcels/1.4/,https://archive.cloudera.com/accumulo-c5/parcels/latest/,https://archive.cloudera.com/kafka/parcels/latest/,http://archive.cloudera.com/kudu/parcels/latest/,https://archive.cloudera.com/spark/parcels/latest/,https://archive.cloudera.com/sqoop-connectors/parcels/latest/,http://edge.cloudera.es/cdh/5/rpms"
     } ]
   }
-
+ ```
