@@ -98,18 +98,18 @@ sudo useradd -u 1200 -g inserters ferdinand
 * add_principal george and ferdinand
 ```
 $ sudo kadmin.local
-Authenticating as principal cloudera-scm/admin@C.SAFARI-LAB.INTERNAL with password.
+Authenticating as principal cloudera-scm/admin@KODE.COM with password.
 kadmin.local:  add_principal george
-WARNING: no policy specified for george@C.SAFARI-LAB.INTERNAL; defaulting to no policy
-Enter password for principal "george@C.SAFARI-LAB.INTERNAL": 
-Re-enter password for principal "george@C.SAFARI-LAB.INTERNAL": 
-Principal "george@C.SAFARI-LAB.INTERNAL" created.
+WARNING: no policy specified for george@KODE.COML; defaulting to no policy
+Enter password for principal "george@KODE.COM": 
+Re-enter password for principal "george@KODE.COM": 
+Principal "george@KODE.COM" created.
 
 kadmin.local:  add_principal ferdinand
-WARNING: no policy specified for ferdinand@C.SAFARI-LAB.INTERNAL; defaulting to no policy
-Enter password for principal "ferdinand@C.SAFARI-LAB.INTERNAL": 
-Re-enter password for principal "ferdinand@C.SAFARI-LAB.INTERNAL": 
-Principal "ferdinand@C.SAFARI-LAB.INTERNAL" created.
+WARNING: no policy specified for ferdinand@KODE.COM; defaulting to no policy
+Enter password for principal "ferdinand@KODE.COM": 
+Re-enter password for principal "ferdinand@KODE.COM": 
+Principal "ferdinand@KODE.COM" created.
 
 kadmin.local:  quit
 ```
