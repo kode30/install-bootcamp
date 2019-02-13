@@ -1,3 +1,5 @@
+##Information for the Excel
+```
 Worker vcores	28	
 Worker spindles	12	
 Worker RAM	128	
@@ -14,3 +16,4 @@ HBase	0	0
 Solr	0	0
 YARN resources	51	23
 		
+```
