@@ -1,4 +1,4 @@
-#Create User & Directory
+## Create User & Directory
 ```
 useradd kod30
 passwd kod30
@@ -8,7 +8,7 @@ sudo su - kod30
 sudo -u hdfs hdfs dfs -mkdir /user/kod30
 #sudo -u hdfs hdfs dfs -chown kod30:kod30 /user/kod30
 ```
-##Create a 10 GB file using teragen
+## Create a 10 GB file using teragen
 ```
 [kod30@edge jars]$ time hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar teragen -D dfs.blocksize=33554432 -D dfs.replication=1 1000000 /user/kode30/teragen
 
@@ -74,7 +74,7 @@ real    0m9.358s
 user    0m6.273s
 sys     0m0.242s
 ```
-##Run the terasort command on this file 
+## Run the terasort command on this file 
 ```
 [kod30@edge jars]$time hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar terasort /user/kode30/teragen /user/kode30/teragen
 19/02/12 13:14:47 INFO terasort.TeraSort: starting
