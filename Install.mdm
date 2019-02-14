@@ -1,16 +1,16 @@
 
 ---
-<div style="page-break-after: always;"></div>
 
-# <center> Install Cloudera
+
+# Install Cloudera
 
 * Steps for complete installation
 * Nodes: 2 Masters + 2 Workers, 1 Edge
  
 ---
-<div style="page-break-after: always;"></div>
 
-## <center> Pre-Requirements
+
+## Pre-Requirements
 
 * Mount, Format Disk, Configure .init (in all Nodes):
 
@@ -127,7 +127,7 @@
 ```
 
 
-## <center> Install Java
+## Install Java
 
 * Select the last version of Java:
 	Example: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
@@ -149,7 +149,7 @@
 ```
 
 
-## <center> Install BBDD (MySQL, MariaDB, Post, Oracle,etc)
+## Install BBDD (MySQL, MariaDB, Post, Oracle,etc)
 
 * Select correct version of the BBDD:
 	Example: http://yum.mariadb.org/5.5/rhel7-amd64/
@@ -394,7 +394,7 @@
 	
 ```
 
-## <center> Install Cloudera Manager
+## Install Cloudera Manager
 
 * Select correct version of Cloudera:
 
@@ -462,7 +462,7 @@
 	
 ```
 
-## <center> Install Cloudera Agents
+## Install Cloudera Agents
 
 * Install in all Nodes:
 
@@ -501,7 +501,7 @@
 
 ```
 
-## <center> Install Cloudera Hadoop Services - Core (CDH)
+## Install Cloudera Hadoop Services - Core (CDH)
 
 * Acces the first time for select the services to nodes:
 
@@ -512,7 +512,7 @@
 	
 ```
 
-## <center> API TEST
+## API TEST
 
 * Examples:
 
@@ -528,7 +528,7 @@ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com
 ```
 
 
-## <center> HDFS Testing
+## HDFS Testing
 
 * Teragen for generate Data:
 
@@ -548,7 +548,7 @@ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com
 	
 ```
 
-## <center> Kerberos
+##  Kerberos
 
 * Example:
 
@@ -718,7 +718,7 @@ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com
 
 ```
 
-## <center> Sentry
+## Sentry
 
 ```
 
@@ -764,7 +764,7 @@ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com
 
 ```
 
-## <center> Kerberos
+## Kerberos
 
 ```
 
