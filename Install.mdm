@@ -1,7 +1,4 @@
-```
 ---
-
-
 # Install Cloudera
 
 * Steps for complete installation
@@ -809,4 +806,4 @@ curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com
 	Add hive, impala, hue in the admin groups property – save changes
 
 ```
-```
+
