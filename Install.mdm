@@ -1,0 +1,815 @@
+<!-- CSS work goes here for the time being -->
+<!-- set a:link text-decoration to none -->
+<!-- set a:hover text-decoration to underline -->
+<!-- http://forums.markdownpad.com/discussion/143/include-pdf-pagebreak-instructions-in-markdown/p1 -->
+
+---
+<div style="page-break-after: always;"></div>
+
+# <center> Install Cloudera
+
+* Steps for complete installation
+* Nodes: 2 Masters + 2 Workers, 1 Edge
+ 
+---
+<div style="page-break-after: always;"></div>
+
+## <center> Pre-Requirements
+
+* Mount, Format Disk, Configure .init (in all Nodes):
+
+```
+	lsblk #(/dev/nvme1n1)
+	file -s /dev/nvme1n1
+	mkfs -t ext4 /dev/nvme1n1
+	mkdir /clouderadata
+	mount /dev/nvme1n1 /clouderadata
+	
+	vi /etc/fstab=
+		/dev/nvme1n1                              /clouderadata           ext4    defaults        0 0
+    
+```
+
+* Disable SELinux Mode (in all Nodes):
+
+```
+	vi /etc/sysconfig/selinux =
+		selinux = disabled
+	
+	sestatus
+	reboot #(Restart Node)
+ 
+```
+
+* Changing the Swappiness (in all Nodes):
+
+```
+	vi /etc/sysctl.conf =
+		vm.swappiness = 1
+ 
+```
+
+* Disable the tuned Service (in all Nodes):
+
+```
+	systemctl start tuned
+    tuned-adm off
+    tuned-adm list
+    systemctl stop tuned
+    systemctl disable tuned
+ 
+```
+
+* Disable Transparent Hugepages THP (in all Nodes):
+
+```
+	vi /etc/rc.d/rc.local =
+		echo never > /sys/kernel/mm/transparent_hugepage/enabled
+		echo never > /sys/kernel/mm/transparent_hugepage/defrag
+	
+	chmod +x /etc/rc.d/rc.local
+	
+	vi /etc/default/grub =
+		transparent_hugepage=never
+		
+	grub2-mkconfig -o /boot/grub2/grub.cfg
+	
+	reboot #(Restart Node)
+ 
+```
+
+* Add Hosts /etc/hots (in all Nodes):
+
+```
+	sudo hostnamectl set-hostname edge.cloudera.es
+	sudo hostnamectl set-hostname master1.cloudera.es
+	sudo hostnamectl set-hostname master2.cloudera.es
+	sudo hostnamectl set-hostname worker1.cloudera.es
+	sudo hostnamectl set-hostname worker2.cloudera.es
+	
+	vi/etc/hosts =
+		172.31.34.49 edge.cloudera.es edge
+		172.31.43.192 master1.cloudera.es master1
+		172.31.36.36 master2.cloudera.es master2
+		172.31.38.139 worker1.cloudera.es worker1
+		172.31.36.148 worker2.cloudera.es worker2
+		
+	vi /etc/sysconfig/network =
+		HOSTNAME=edge.cloudera.es
+		HOSTNAME=master1.cloudera.es
+		HOSTNAME=master2.cloudera.es
+		HOSTNAME=worker1.cloudera.es
+		HOSTNAME=worker2.cloudera.es
+ 
+```
+
+* Add Service (in all Nodes):
+
+```
+	yum install nscd
+
+	systemctl start nscd.service
+	systemctl enable nscd.service
+	systemctl status nscd.service
+	
+	yum install ntp
+
+	systemctl start ntpd
+	systemctl enable ntpd
+	systemctl status ntpd
+ 
+```
+
+* Add User (in all Nodes):
+
+```
+	sudo groupadd selector
+	sudo groupadd inserters
+	sudo useradd -u 1100 -g selector george
+	sudo useradd -u 1200 -g inserters ferdinand
+ 
+```
+
+
+## <center> Install Java
+
+* Select the last version of Java:
+	Example: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+	File:    jre-8u201-linux-x64.rpm
+	
+* Copy the file in all nodes (winscp):
+	Example: /home/ec2-user
+	
+* Install Java SDK in all nodes :
+
+```
+	rpm -i jre-8u201-linux-x64.rpm
+	java -version
+	
+	vi /etc/profile.d/custom.sh =
+		export JAVA_HOME=/usr/java/default
+		export PATH=$PATH:$JAVA_HOME/bin
+	
+```
+
+
+## <center> Install BBDD (MySQL, MariaDB, Post, Oracle,etc)
+
+* Select correct version of the BBDD:
+	Example: http://yum.mariadb.org/5.5/rhel7-amd64/
+	OS:      RHEL 7 (64 Bits)
+	
+* Create Repository:
+
+```
+	vi /etc/yum.repos.d/mariadb.repo =
+		[mariadb]
+		name = MariaDB
+		baseurl = http://yum.mariadb.org/5.5/rhel7-amd64/
+		gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+		gpgcheck=1
+		enable=1
+	
+```
+
+* Install BBDD :
+
+```
+	#MariaDB
+	yum install MariaDB-server MariaDB-client
+
+	#MySQL
+	yum install wget
+	wget https://dev.mysql.com/get/mysql57-community-release-el6-9.noarch.rpm
+	rpm -ivh mysql57-community-release-el6-9.noarch.rpm
+
+	vi /etc/yum.repos.d/mysql-community.repo
+		(Enable = 1 version)
+	
+	sudo yum install mysql -y mysql-community-server
+	
+```
+
+* Configuration BBDD :
+
+```
+	#CONFIGURE FILE
+	sudo systemctl stop mariadb
+	
+	vi /etc/my.cnf
+		[mysqld]
+		datadir=/var/lib/mysql
+		socket=/var/lib/mysql/mysql.sock
+		transaction-isolation = READ-COMMITTED
+		# Disabling symbolic-links is recommended to prevent assorted security risks;
+		# to do so, uncomment this line:
+		symbolic-links = 0
+		# Settings user and group are ignored when systemd is used.
+		# If you need to run mysqld under a different user or group,
+		# customize your systemd unit file for mariadb according to the
+		# instructions in http://fedoraproject.org/wiki/Systemd
+
+		key_buffer = 16M
+		key_buffer_size = 32M
+		max_allowed_packet = 32M
+		thread_stack = 256K
+		thread_cache_size = 64
+		query_cache_limit = 8M
+		query_cache_size = 64M
+		query_cache_type = 1
+
+		max_connections = 550
+		#expire_logs_days = 10
+		#max_binlog_size = 100M
+
+		#log_bin should be on a disk with enough free space.
+		#Replace '/var/lib/mysql/mysql_binary_log' with an appropriate path for your
+		#system and chown the specified folder to the mysql user.
+		log_bin=/var/lib/mysql/mysql_binary_log
+
+		#In later versions of MariaDB, if you enable the binary log and do not set
+		#a server_id, MariaDB will not start. The server_id must be unique within
+		#the replicating group.
+		server_id=1
+
+		binlog_format = mixed
+
+		read_buffer_size = 2M
+		read_rnd_buffer_size = 16M
+		sort_buffer_size = 8M
+		join_buffer_size = 8M
+
+		# InnoDB settings
+		innodb_file_per_table = 1
+		innodb_flush_log_at_trx_commit  = 2
+		innodb_log_buffer_size = 64M
+		innodb_buffer_pool_size = 4G
+		innodb_thread_concurrency = 8
+		innodb_flush_method = O_DIRECT
+		innodb_log_file_size = 512M
+
+		[mysqld_safe]
+		log-error=/var/log/mariadb/mariadb.log
+		pid-file=/var/run/mariadb/mariadb.pid
+
+		#
+		# include all files from the config directory
+		#
+		!includedir /etc/my.cnf.d
+		
+	systemctl enable mariadb
+	systemctl start mariadb
+	
+	#SECURITY
+	sudo /usr/bin/mysql_secure_installation
+	Password root-cloudera
+	Y - Y - (Disable root login remoty) N - Y - Y
+	
+```
+
+* Driver JDBC BBDD (in all nodes) :
+
+```
+	yum install wget
+
+	wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.46.tar.gz
+
+	tar zxvf mysql-connector-java-5.1.46.tar.gz
+	sudo mkdir -p /usr/share/java/
+	cd mysql-connector-java-5.1.46
+	sudo cp mysql-connector-java-5.1.46-bin.jar /usr/share/java/mysql-connector-java.jar
+	
+```
+
+* HA MariaDB (opcional) :
+
+	Note: https://www.tecmint.com/mariadb-master-slave-replication-on-centos-rhel-debian/
+
+```
+	# Install MariaDB in Slave node (master1)
+
+	sudo yum install mariadb-server
+	systemctl start mariadb
+	/usr/bin/mysql_secure_installation
+
+	# Change File configuration
+
+		PRIMARY (edge.cloudera.es)
+			vi /etc/my.cnf =
+				replicate-do-db=scm (BBDD to replicate)
+				bind-address=172.31.34.49 (Ip Primary - edge.cloudera.es)
+			
+			systemctl restart mariadb
+
+			mysql -u root -p
+			CREATE USER 'slave'@'localhost' IDENTIFIED BY 'cloudera';
+			GRANT REPLICATION SLAVE ON *.* TO slave IDENTIFIED BY 'cloudera' WITH GRANT OPTION;
+			FLUSH PRIVILEGES;
+			FLUSH TABLES WITH READ LOCK;
+			SHOW MASTER STATUS;
+			exit
+
+			mysqldump -u root -p scm > scm-dump.sql
+
+			#Copy to server slave
+			scp -i /home/ec2-user/Cloudera_SEB.pem scm-dump.sql ec2-user@master1.cloudera.es:/home/ec2-user/
+
+		SLAVE (master1.cloudera.es):
+
+			mysql -u root –p
+
+			CREATE DATABASE scm;
+			GRANT ALL PRIVILEGES ON scm.* TO 'slave'@'localhost' WITH GRANT OPTION;
+			FLUSH PRIVILEGES;
+
+			mysql -u root -p scm < scm-dump.sq
+
+			vi /etc/my.cnf =
+				server_id=2
+				replicate-do-db=scm
+
+			###SEE INFORMATION IN PRIMARY NODE FOR THE VALUE LOG_FILE & LOG_POS
+
+			CHANGE MASTER TO MASTER_HOST='172.31.34.49';
+			CHANGE MASTER TO MASTER_USER='slave';
+			CHANGE MASTER TO MASTER_PASSWORD='cloudera';
+			CHANGE MASTER TO MASTER_PORT=3306;
+			CHANGE MASTER TO MASTER_LOG_FILE='mysql_binary_log.000004';
+			CHANGE MASTER TO MASTER_LOG_POS=592;
+			CHANGE MASTER TO MASTER_CONNECT_RETRY=10;
+			#CHANGE MASTER TO MASTER_USE_GTID=current_pos;
+
+			SHOW SLAVE STATUS\G;
+
+	# ?Workaround convert Varchar?
+		SLAVE: stop -> SET GLOBAL slave_type_conversions='ALL_NON_LOSSY,ALL_LOSSY' -> start
+	
+```
+* Create BBDD for Cloudera :
+
+```
+	mysql -u root -p
+	
+	CREATE DATABASE <database> DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON <database>.* TO '<user>'@'%' IDENTIFIED BY '<password>';
+
+	CREATE DATABASE scm DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON scm.* TO 'scm'@'%' IDENTIFIED BY 'scm';
+
+	CREATE DATABASE amon DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON amon.* TO 'amon'@'%' IDENTIFIED BY 'amon';
+
+	CREATE DATABASE rman DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON rman.* TO 'rman'@'%' IDENTIFIED BY 'rman';
+
+	CREATE DATABASE hue DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON hue.* TO 'hue'@'%' IDENTIFIED BY 'hue';
+
+	CREATE DATABASE metastore DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON metastore.* TO 'hive'@'%' IDENTIFIED BY 'hive';
+
+	CREATE DATABASE sentry DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON sentry.* TO 'sentry'@'%' IDENTIFIED BY 'sentry';
+
+	CREATE DATABASE nav DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON nav.* TO 'nav'@'%' IDENTIFIED BY 'nav';
+
+	CREATE DATABASE navms DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON navms.* TO 'navms'@'%' IDENTIFIED BY 'navms';
+
+	CREATE DATABASE oozie DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	GRANT ALL ON oozie.* TO 'oozie'@'%' IDENTIFIED BY 'oozie';
+
+	SHOW GRANTS FOR 'smc'@'%';
+
+```
+
+* Driver JDBC BBDD (in all nodes) :
+
+```
+	yum install wget
+
+	wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.46.tar.gz
+
+	tar zxvf mysql-connector-java-5.1.46.tar.gz
+	sudo mkdir -p /usr/share/java/
+	cd mysql-connector-java-5.1.46
+	sudo cp mysql-connector-java-5.1.46-bin.jar /usr/share/java/mysql-connector-java.jar
+	
+```
+
+## <center> Install Cloudera Manager
+
+* Select correct version of Cloudera:
+
+	Example: https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/5.15/
+	OS:      5.15
+	
+* Create Repository:
+
+```
+	wget https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/cloudera-manager.repo -P /etc/yum.repos.d/
+
+	vi /etc/yum.repos.d/cloudera-manager.repo =
+		[cloudera-manager]
+		name = Cloudera Manager, Version 5.16.1
+		baseurl = https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/5.15/  (#Here change the version#)
+		gpgkey = https://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera
+		gpgcheck = 1
+
+	rpm --import https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/RPM-GPG-KEY-cloudera
+
+```
+
+* Install Cloudera Manager Server:
+
+```
+	sudo yum install cloudera-manager-daemons cloudera-manager-server cloudera-manager-agent
+	
+```
+
+* Create Repository in CMS for the other server
+
+	Note: https://www.hadoopandcloud.com/hadoop/set-up-a-local-cdh-repository/
+
+```
+	yum install httpd -y
+	service httpd start
+	yum install yum-utils createrepo -y
+	reposync -r cloudera-manager
+	
+	# Move to html repository all files
+	
+	mkdir -p /var/www/html/cdh/5/rpms
+	cp /etc/yum.repos.d/cloudera-manager/RPMS/x86_64/* /var/www/html/cdh/5/rpms
+	
+	cd /var/www/html/cdh/5/
+	createrepo rpms
+	
+	# Change the cloudera.repo for configure de baseurl
+	
+	vi /etc/yum.repos.d/cloudera-manager.repo = 
+		[cloudera-manager]
+			# Packages for Cloudera Manager, Version 5, on RedHat or CentOS 7 x86_64
+			name=Cloudera Manager
+			#baseurl=https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/5/
+			baseurl=http://edge.cloudera.es/cdh/5/rpms
+			gpgkey =https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/RPM-GPG-KEY-cloudera
+			gpgcheck = 1
+			
+	# Distribution this file to the all nodes (for install all products)
+	
+	Example: master1.cloudera.es
+		master1.cloudera.es
+		scp -i /home/ec2-user/Cloudera_SEB.pem /etc/yum.repos.d/cloudera-manager.repo ec2-user@master1.cloudera.es:/home/ec2-user/
+		cp /home/ec2-user/cloudera-manager.repo  /etc/yum.repos.d/
+	
+```
+
+## <center> Install Cloudera Agents
+
+* Install in all Nodes:
+
+```
+	sudo yum install cloudera-manager-daemons cloudera-manager-agent
+	
+```
+
+* Configure in all Nodes:
+
+```
+	vi /etc/cloudera-scm-agent/config.ini =
+		server_host=edge.cloudera.es
+		
+	systemctl start cloudera-scm-agent
+
+```
+
+* Configure BBDD in Cloudera Manager:
+
+	Example = sudo /usr/share/cmf/schema/scm_prepare_database.sh <databaseType> <databaseName> <databaseUser>
+
+```
+	sudo /usr/share/cmf/schema/scm_prepare_database.sh mysql -h edge.cloudera.es scm scm
+
+```
+
+* Verifice Cloudera Manager:Example = sudo /usr/share/cmf/schema/scm_prepare_database.sh <databaseType> <databaseName> <databaseUser>
+
+```
+	systemctl start cloudera-scm-server
+
+	tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
+
+	# Find this: INFO WebServerImpl:com.cloudera.server.cmf.WebServerImpl: Started Jetty server
+
+```
+
+## <center> Install Cloudera Hadoop Services - Core (CDH)
+
+* Acces the first time for select the services to nodes:
+
+	Example: http://ippublica:7180
+
+```
+	http://ec2-35-180-243-60.eu-west-3.compute.amazonaws.com:7180
+	
+```
+
+## <center> API TEST
+
+* Examples:
+
+```
+curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v18/clusters/Kode30/services'
+
+curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v14/hosts'
+
+curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v18/clusters'
+
+curl -u kode30:cloudera 'http://ec2-35-180-198-7.eu-west-3.compute.amazonaws.com:7180/api/v13/clusters/Kode30/services/hive/'
+	
+```
+
+
+## <center> HDFS Testing
+
+* Teragen for generate Data:
+
+	Example: user bavaria, record 51,200,000, block size to 16 MB,Name the target directory tgen512m, 8 directory
+	Validate: hadoop fsck /user/bavaria/tgen512m
+```
+	time hadoop jar /opt/cloudera/parcels/CDH/jars/hadoop-examples.jar teragen -D mapred.map.tasks=8 -D dfs.blocksize=16777216 51200000 /user/bavaria/tgen512m
+	
+	hadoop fsck /user/bavaria/tgen512m
+	
+```
+	Example: user bavaria, record 65,536,000,  block size to 64 MB,Name the target directory hilary , output to 16 files, mapper container size to 768 MiB
+	Validate: hadoop fsck /user/bavaria/tgen512m
+```
+	time hadoop jar /opt/cloudera/parcels/CDH/lib/hadoop-0.20-mapreduce/hadoop-examples.jar teragen -D dfs.block.size=640000000 -Dmapreduce.job.maps=16  -Dmapreduce.map.memory.mb=768 65536000 /user/hilary/tgen
+	hadoop fsck /user/bavaria/tgen512m
+	
+```
+
+## <center> Kerberos
+
+* Example:
+
+	Edge      –> Kerberos Server & Client (KDC) You can make a remote node as server
+	Master1,2 –> Kerberos Client
+	Worker1,2 –> Kerberos Client
+	Domain: KODE.COM
+```
+	1) Installa Java Cryptography
+	yum install unzip
+	sudo wget -nv --no-check-certificate --no-cookies --header "Cookie:oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip -O /usr/java/default/lib/security/UnlimitedJCEPolicyJDK7.zip
+	cd /usr/java/default/lib/security
+	sudo unzip UnlimitedJCEPolicyJDK7.zip
+	sudo cp UnlimitedJCEPolicy/* .
+	sudo rm -r UnlimitedJCEPolicy*
+
+	2) Install Kerbero
+
+	EDGE (Kerbero Server)
+	yum -y install krb5-server krb5-libs krb5-workstation krb5-auth-dialog
+
+	Master,Worker (Kerbero CLiente)
+	yum -y install krb5-workstation krb5-libs krb5-auth-dialog
+
+	**EDGE (Server)
+	vi /var/kerberos/krb5kdc/kdc.conf --> Modificar
+
+	[kdcdefaults]
+	 kdc_ports = 88
+	 kdc_tcp_ports = 88
+
+	[realms]
+	 KODE.COM = {
+	  #master_key_type = aes256-cts
+	  acl_file = /var/kerberos/krb5kdc/kadm5.acl
+	  dict_file = /usr/share/dict/words
+	  admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab
+	  supported_enctypes = aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
+	  max_life = 1d
+	  max_renewable_life = 7d 0h 0m 0s
+	  default_principal_flags = +renewable
+	   
+	 }
+
+	*** Cliente
+
+	vi /etc/krb5.conf 
+
+	[logging]
+	 default = FILE:/var/log/krb5libs.log
+	 kdc = FILE:/var/log/krb5kdc.log
+	 admin_server = FILE:/var/log/kadmind.log
+
+	[libdefaults]
+	 default_realm = KODE.COM
+	 dns_lookup_realm = false
+	 dns_lookup_kdc = false
+	 ticket_lifetime = 1d
+	 renew_lifetime = 7d 0h 0m 0s
+	 forwardable = true
+	 udp_preference_limit = 1
+	 default_tgs_enctypes = aes256-cts
+	 default_tkt_enctypes = aes256-cts
+
+	[realms]
+	  KODE.COM = {
+	  kdc = edge.cloudera.es
+	  admin_server = edge.cloudera.es
+	 }
+
+	[domain_realm]
+	   .cloudera.es = KODE.COM
+	   cloudera.es = KODE.COM
+
+
+	3) Create Database (Server Edge)
+	/usr/sbin/kdb5_util create -s
+
+	4) Add Cloudera-smc 
+	kadmin.local
+
+	kadmin.local:  addprinc cloudera-scm@KODE.COM
+	WARNING: no policy specified for cloudera-scm@KODE.com; defaulting to no policy
+	Enter password for principal "cloudera-scm@KODE.com":
+	Re-enter password for principal "cloudera-scm@KODE.com":
+	Principal "cloudera-scm@KODE.com" created.
+	exit
+
+	5) Add */admin and cloudera-scm to AC (Server Edge)
+	vi /var/kerberos/krb5kdc/kadm5.acl 
+
+	*/admin@KODE.COM *
+	cloudera-scm@KODE.COM admilc
+
+	6) Password Polict Databas (Server Edge)
+
+	kadmin.local
+	Authenticating as principal root/admin@KODE.COM with password.
+	kadmin.local:  addpol admin
+	kadmin.local:  addpol users
+	kadmin.local:  addpol hosts
+	kadmin.local:  exit
+
+	7) Generate cmf.keytab (Server Edge)
+	kadmin.local
+	xst -k cmf.keytab cloudera-scm@KODE.COM
+	exit
+
+	8) Move keytab (Server Edge)
+	/var/kerberos
+	mv cmf.keytab /etc/cloudera-scm-server/
+	chown cloudera-scm:cloudera-scm /etc/cloudera-scm-server/cmf.keytab 
+	chmod 600 /etc/cloudera-scm-server/cmf.keytab
+
+	9) Create a file called cmf.principa (Server Edge)
+	vi /etc/cloudera-scm-server/cmf.principal
+	----->cloudera-scm@KODE.COM
+	chown cloudera-scm:cloudera-scm /etc/cloudera-scm-server/cmf.principal 
+	chmod 600 /etc/cloudera-scm-server/cmf.principal
+
+	10) Start Kerber (Server Edge)
+
+	service krb5kdc start
+	service kadmin start
+
+	**Option
+	chkconfig krb5kdc on
+	chkconfig kadmin on
+
+	11) Cloudera Manager:
+
+	Administration -> Settings -> Security ->Kerberos Security Realm -> KODE.COM
+
+	Zookeeper Service -> Configuration -> Service-wide ->  Enable Kerberos Authentication -> Check
+
+	HDFS Service -> Configuration -> Service-wide -> Security -> Hadoop Secure Authentication -> Click and Select "kerberos"
+	HDFS Service -> Configuration -> Service-wide -> Security -> Hadoop Secure Authorization  -> Select the checkbox
+	HDFS Service -> Configuration -> Datanode(Default) -> Security -> DataNode Data Directory Permissions -> 700
+
+	For every DataNode Role Config Group:
+	HDFS Service -> Configuration -> Datanode(Default) -> Ports and Addresses -> Datanode Transceiver Port ->  1004
+	HDFS Service -> Configuration -> Datanode(Default) -> Ports and Addresses -> Datanode HTTP Web UI Port -> 1006
+
+	Hue Service -> Add -> Instances -> Assign the Kerberos Ticket Renewer role instance to the same host as the Hue server
+
+	Hive Service -> Configuration -> Service-wide -> Advanced -> Hive Service Configuration Safety Valve for hive-site.xml
+	Add the below 3 property tags there:
+	<property>
+	  <name>hive.server2.authentication</name>
+	  <value>KERBEROS</value>
+	</property>
+	<property>
+	  <name>hive.server2.authentication.kerberos.principal</name>
+	  <value>hive/_HOST@KODE.COM</value>
+	</property>
+	<property>
+	 <name>hive.stats.ndv.error</name>
+	 <value>5.0</value>
+	</property>
+
+	Actions -> Deploy Client Configuration
+	Restar Cloudera manager
+	Restar Cluster
+
+	####SINO INCIA EL SERVICIO HUE
+	modprinc -maxrenewlife "7 days" krbtgt/KODE.COM@KODE.COM
+
+```
+
+## <center> Sentry
+
+```
+
+	kadmin.local
+	kadmin.local:  addprinc hdfs@KODE.COM
+
+	kinit hdfs 
+	hdfs dfs -chmod -R 771 /user/hive/warehouse
+	hdfs dfs -chown -R hive:hive /user/hive/warehouse
+
+
+	1) Disable impersonation for HiveServer2:
+	CM – Hive – Configuration – Category:Main – HiveServer2 Enable Impersonation
+
+	2) Enable Hive user to submit jobs:
+	CM – YARN – configuration – search ‘Allowed system users’
+	Ensure the Allowed System Users property includes the hive user. If not, add hive.
+
+	3) Block the Hive CLI user from accessing the Hive metastore:
+	CM – Hive – Configuration - search ' Hive Metastore Access Control and Proxy User Groups Override'
+	hive into the text box and click the plus sign again.
+	hue into the text box.
+
+	4)  Disable Sentry Policy Files:
+	CM – Hive – configuration – search ‘sentry’ – uncheck “Enable Sentry Authorization using Policy Files” – save changes.
+
+	5) Add Sentry Service:
+	Go to CM – Cluster dropdown – add service – select Sentry – continue
+
+	6) Configure Sentry Service:
+
+	Go to CM – Hive – configuration – search ‘sentry’ – Enable Sentry service
+
+	Ensure prerequisites are done for hive.
+	CM – Impala – configuration – search ‘sentry’ – Enable Sentry service
+	CM – Hue – configuration – search ‘sentry’ – Enable Sentry service
+
+
+	7) Add the Hive, Impala and Hue Groups to Sentry’s Admin Group:
+
+	CM – Sentry – configuration – Category:Main – search “Admin groups”
+	Add hive, impala, hue in the admin groups property – save changes
+
+```
+
+## <center> Kerberos
+
+```
+
+	kadmin.local
+	kadmin.local:  addprinc hdfs@KODE.COM
+
+	kinit hdfs 
+	hdfs dfs -chmod -R 771 /user/hive/warehouse
+	hdfs dfs -chown -R hive:hive /user/hive/warehouse
+
+
+	1) Disable impersonation for HiveServer2:
+	CM – Hive – Configuration – Category:Main – HiveServer2 Enable Impersonation
+
+	2) Enable Hive user to submit jobs:
+	CM – YARN – configuration – search ‘Allowed system users’
+	Ensure the Allowed System Users property includes the hive user. If not, add hive.
+
+	3) Block the Hive CLI user from accessing the Hive metastore:
+	CM – Hive – Configuration - search ' Hive Metastore Access Control and Proxy User Groups Override'
+	hive into the text box and click the plus sign again.
+	hue into the text box.
+
+	4)  Disable Sentry Policy Files:
+	CM – Hive – configuration – search ‘sentry’ – uncheck “Enable Sentry Authorization using Policy Files” – save changes.
+
+	5) Add Sentry Service:
+	Go to CM – Cluster dropdown – add service – select Sentry – continue
+
+	6) Configure Sentry Service:
+
+	Go to CM – Hive – configuration – search ‘sentry’ – Enable Sentry service
+
+	Ensure prerequisites are done for hive.
+	CM – Impala – configuration – search ‘sentry’ – Enable Sentry service
+	CM – Hue – configuration – search ‘sentry’ – Enable Sentry service
+
+
+	7) Add the Hive, Impala and Hue Groups to Sentry’s Admin Group:
+
+	CM – Sentry – configuration – Category:Main – search “Admin groups”
+	Add hive, impala, hue in the admin groups property – save changes
+
+```
