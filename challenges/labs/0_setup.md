@@ -48,25 +48,40 @@ List the file system capacity for the first node
         
 List the command and output for yum repolist enabled
 ```
-
+[root@edge ec2-user]# yum repolist enabled
+Loaded plugins: amazon-id, rhui-lb, search-disabled-repos
+repo id                                               repo name                                                            status
+rhui-REGION-client-config-server-7/x86_64             Red Hat Update Infrastructure 2.0 Client Configuration Server 7           2
+rhui-REGION-rhel-server-releases/7Server/x86_64       Red Hat Enterprise Linux Server 7 (RPMs)                             23,676
+rhui-REGION-rhel-server-rh-common/7Server/x86_64      Red Hat Enterprise Linux Server 7 RH Common (RPMs)                      235
+repolist: 23,913
 ```
-
 
 List the /etc/passwd entries for rocky and denali
             Do not list the entire file - only in one node
 ```
+[root@edge ec2-user]# cat /etc/passwd | grep rocky
+rocky:x:3800:1002::/home/rocky:/bin/bash
 
+[root@edge ec2-user]# cat /etc/passwd | grep denali
+denali:x:3900:1001::/home/denali:/bin/bash
 ```
 List the /etc/group entries for alaska and colorado
             Do not list the entire file - only in one node
 ```
-
+[root@edge ec2-user]# cat /etc/group | grep alask
+alaska:x:1001:
+[root@edge ec2-user]# cat /etc/group | grep colorado
+colorado:x:1002:
 ```
 
 List the output of the following commands:
             getent group alaska
             getent passwd rocky
 ```
-
+[root@edge ec2-user]#  getent group alaska
+alaska:x:1001:
+[root@edge ec2-user]# getent passwd rocky
+rocky:x:3800:1002::/home/rocky:/bin/bash
 ```
 
