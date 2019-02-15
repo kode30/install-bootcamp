@@ -1,4 +1,4 @@
-Use a YUM repository to install the package
+## 1) Use a YUM repository to install the package
 
 ```
 [root@edge ec2-user]# yum install MariaDB-server MariaDB-client
@@ -512,7 +512,7 @@ Complete!
 
 ```
 
-Copy the repo configuration you used to challenges/labs/1_my-database-server.repo.md
+##2) Copy the repo configuration you used to challenges/labs/1_my-database-server.repo.md
 ```
 [root@edge ec2-user]# cat /etc/yum.repos.d/mariadb.repo
 [mariadb]
