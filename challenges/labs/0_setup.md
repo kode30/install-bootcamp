@@ -55,6 +55,38 @@ rhui-REGION-client-config-server-7/x86_64             Red Hat Update Infrastruct
 rhui-REGION-rhel-server-releases/7Server/x86_64       Red Hat Enterprise Linux Server 7 (RPMs)                             23,676
 rhui-REGION-rhel-server-rh-common/7Server/x86_64      Red Hat Enterprise Linux Server 7 RH Common (RPMs)                      235
 repolist: 23,913
+
+[root@master1 ec2-user]# yum repolist enabled
+Loaded plugins: amazon-id, rhui-lb, search-disabled-repos
+repo id                                          repo name                status
+rhui-REGION-client-config-server-7/x86_64        Red Hat Update Infrastru      2
+rhui-REGION-rhel-server-releases/7Server/x86_64  Red Hat Enterprise Linux 23,676
+rhui-REGION-rhel-server-rh-common/7Server/x86_64 Red Hat Enterprise Linux    235
+repolist: 23,913
+
+[root@master2 ec2-user]# yum repolist enabled
+Loaded plugins: amazon-id, rhui-lb, search-disabled-repos
+repo id                                          repo name                status
+rhui-REGION-client-config-server-7/x86_64        Red Hat Update Infrastru      2
+rhui-REGION-rhel-server-releases/7Server/x86_64  Red Hat Enterprise Linux 23,676
+rhui-REGION-rhel-server-rh-common/7Server/x86_64 Red Hat Enterprise Linux    235
+repolist: 23,913
+
+[root@worker1 ec2-user]# yum repolist enabled
+Loaded plugins: amazon-id, rhui-lb, search-disabled-repos
+repo id                                          repo name                                               status
+rhui-REGION-client-config-server-7/x86_64        Red Hat Update Infrastructure 2.0 Client Configuration       2
+rhui-REGION-rhel-server-releases/7Server/x86_64  Red Hat Enterprise Linux Server 7 (RPMs)                23,676
+rhui-REGION-rhel-server-rh-common/7Server/x86_64 Red Hat Enterprise Linux Server 7 RH Common (RPMs)         235
+repolist: 23,913
+
+[root@worker2 ec2-user]# yum repolist enabled
+Loaded plugins: amazon-id, rhui-lb, search-disabled-repos
+repo id                                                     repo name                                                                   status
+rhui-REGION-client-config-server-7/x86_64                   Red Hat Update Infrastructure 2.0 Client Configuration Server 7                  2
+rhui-REGION-rhel-server-releases/7Server/x86_64             Red Hat Enterprise Linux Server 7 (RPMs)                                    23,676
+rhui-REGION-rhel-server-rh-common/7Server/x86_64            Red Hat Enterprise Linux Server 7 RH Common (RPMs)                             235
+repolist: 23,913
 ```
 
 List the /etc/passwd entries for rocky and denali
